@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>5 «Б» · Путешествия</title>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
   <style>
     * {
       margin: 0;
@@ -35,22 +38,7 @@
       pointer-events: none;
       z-index: 0;
     }
-  .watermark {
-    position: fixed;
-    bottom: 100px; /* выше таб-бара */
-    right: 16px;
-    font-size: 13px;
-    font-weight: 500;
-    color: rgba(0,0,0,0.18);
-    z-index: 500;
-    pointer-events: none;
-    user-select: none;
-    letter-spacing: 0.3px;
-    backdrop-filter: blur(2px);
-    padding: 2px 8px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.3);
-  }
+
     @keyframes bgShift {
       0% { transform: translate(0, 0) scale(1); }
       100% { transform: translate(3%, 2%) scale(1.02); }
@@ -783,9 +771,26 @@
     .toast.show {
       opacity: 1;
     }
+    .watermark {
+      position: fixed;
+      bottom: 100px;
+      right: 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(0,0,0,0.18);
+      z-index: 500;
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(2px);
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.3);
+    }
   </style>
 </head>
 <body>
+  <!-- Главная -->
   <div id="page-home" class="page active">
     <div class="ios-title">5 «Б» класс</div>
     <div class="card">
@@ -805,11 +810,13 @@
     <p style="text-align: center; color: #5c5c66; font-size: 14px; margin-top: 14px;">5 «Б» — 24 ученика, одна большая семья</p>
   </div>
 
+  <!-- Ученики -->
   <div id="page-students" class="page">
     <div class="ios-title">Наш класс</div>
     <div class="student-grid" id="studentList"></div>
   </div>
 
+  <!-- Фотографии -->
   <div id="page-photos" class="page">
     <div class="ios-title">Фотографии</div>
     <p style="color: #4a4a55; margin-bottom: 24px; font-weight: 500;">📸 Нажми на карточку, чтобы загрузить фото</p>
@@ -817,6 +824,7 @@
     <input type="file" id="hiddenFileInput" accept="image/*" style="display: none;">
   </div>
 
+  <!-- Тест -->
   <div id="page-test" class="page">
     <div class="ios-title">📋 Тест: куда ты ездил?</div>
     <div class="test-wrapper">
@@ -828,11 +836,13 @@
     </div>
   </div>
 
+  <!-- Результаты -->
   <div id="page-results" class="page">
     <div class="ios-title">📊 Результаты</div>
     <div id="resultsContent"></div>
   </div>
 
+  <!-- Поездки -->
   <div id="page-trips" class="page">
     <div class="ios-title">Наши поездки</div>
     
@@ -860,24 +870,12 @@
   </div>
 
   <div class="tab-bar">
-    <button class="tab-item active" data-page="home">
-      <span class="tab-icon">🏠</span><span>Главная</span>
-    </button>
-    <button class="tab-item" data-page="students">
-      <span class="tab-icon">👥</span><span>Класс</span>
-    </button>
-    <button class="tab-item" data-page="photos">
-      <span class="tab-icon">📸</span><span>Фото</span>
-    </button>
-    <button class="tab-item" data-page="test">
-      <span class="tab-icon">📝</span><span>Тест</span>
-    </button>
-    <button class="tab-item" data-page="results">
-      <span class="tab-icon">📊</span><span>Итоги</span>
-    </button>
-    <button class="tab-item" data-page="trips">
-      <span class="tab-icon">🗺️</span><span>Поездки</span>
-    </button>
+    <button class="tab-item active" data-page="home"><span class="tab-icon">🏠</span><span>Главная</span></button>
+    <button class="tab-item" data-page="students"><span class="tab-icon">👥</span><span>Класс</span></button>
+    <button class="tab-item" data-page="photos"><span class="tab-icon">📸</span><span>Фото</span></button>
+    <button class="tab-item" data-page="test"><span class="tab-icon">📝</span><span>Тест</span></button>
+    <button class="tab-item" data-page="results"><span class="tab-icon">📊</span><span>Итоги</span></button>
+    <button class="tab-item" data-page="trips"><span class="tab-icon">🗺️</span><span>Поездки</span></button>
   </div>
 
   <div class="modal-overlay" id="photoModal">
@@ -890,8 +888,22 @@
 
   <input type="file" id="tripPhotoInput" accept="image/*" style="display: none;">
   <div class="toast" id="toast"></div>
+  <div class="watermark">by Mikhail Lugovoy</div>
 
   <script>
+    // Конфигурация Firebase (твоя)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQqSowzCBLnp0GhfqOVWhr-OEZvV55svU",
+      authDomain: "class5b-trips-44828.firebaseapp.com",
+      databaseURL: "https://class5b-trips-44828-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "class5b-trips-44828",
+      storageBucket: "class5b-trips-44828.firebasestorage.app",
+      messagingSenderId: "694588043991",
+      appId: "1:694588043991:web:75262f0bf540149381b692"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     (function() {
       const students = [
         "Бардаков Влад",
@@ -962,31 +974,19 @@
       const toast = document.getElementById('toast');
       let currentTripForPhoto = null;
 
-      const TRIP_PHOTOS_KEY = 'trip_photos';
-      const PLANNED_TRIPS_KEY = 'planned_trips';
+      // Firebase-пути
+      const studentPhotosRef = (name) => db.ref('studentPhotos/' + name);
+      const allStudentPhotosRef = db.ref('studentPhotos');
+      const testResultsRef = (name) => db.ref('testResults/' + name);
+      const allTestResultsRef = db.ref('testResults');
+      const plannedTripsRef = db.ref('plannedTrips');
+      const remindersRef = db.ref('reminders');
+      const tripPhotosRef = (tripId) => db.ref('tripPhotos/' + tripId);
 
       function showToast(text) {
         toast.textContent = text;
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 2500);
-      }
-
-      function getTripPhotos() {
-        const stored = localStorage.getItem(TRIP_PHOTOS_KEY);
-        return stored ? JSON.parse(stored) : {};
-      }
-
-      function saveTripPhotos(photos) {
-        localStorage.setItem(TRIP_PHOTOS_KEY, JSON.stringify(photos));
-      }
-
-      function getPlannedTrips() {
-        const stored = localStorage.getItem(PLANNED_TRIPS_KEY);
-        return stored ? JSON.parse(stored) : [];
-      }
-
-      function savePlannedTrips(trips) {
-        localStorage.setItem(PLANNED_TRIPS_KEY, JSON.stringify(trips));
       }
 
       function switchPage(pageId) {
@@ -1001,8 +1001,8 @@
         if (pageId === 'test') initTest();
         if (pageId === 'trips') {
           renderTripInfo();
-          renderPlannedTrips();
-          renderReminders();
+          loadPlannedTrips();
+          loadReminders();
         }
       }
 
@@ -1012,12 +1012,10 @@
         });
       });
 
-      window.addEventListener('storage', (e) => {
-        if (e.key === PLANNED_TRIPS_KEY) {
-          if (pages.trips.classList.contains('active')) {
-            renderPlannedTrips();
-            showToast('📢 Список запланированных поездок обновлён!');
-          }
+      // Синхронизация запланированных поездок через Firebase (уже через on, поэтому toast не обязателен, но оставим)
+      plannedTripsRef.on('value', () => {
+        if (pages.trips.classList.contains('active')) {
+          // Автоматически обновится через render в loadPlannedTrips
         }
       });
 
@@ -1031,14 +1029,16 @@
       });
 
       function showStudentPhoto(name) {
-        const savedPhoto = localStorage.getItem(`photo_${name}`);
-        modalStudentName.textContent = name;
-        if (savedPhoto) {
-          modalImageContainer.innerHTML = `<img src="${savedPhoto}" class="modal-photo" alt="${name}">`;
-        } else {
-          modalImageContainer.innerHTML = `<div class="modal-no-photo">📷</div>`;
-        }
-        modal.classList.add('active');
+        studentPhotosRef(name).once('value').then(snap => {
+          const savedPhoto = snap.val();
+          modalStudentName.textContent = name;
+          if (savedPhoto) {
+            modalImageContainer.innerHTML = `<img src="${savedPhoto}" class="modal-photo" alt="${name}">`;
+          } else {
+            modalImageContainer.innerHTML = `<div class="modal-no-photo">📷</div>`;
+          }
+          modal.classList.add('active');
+        });
       }
 
       function renderStudentList() {
@@ -1060,27 +1060,30 @@
       function renderPhotoGrid() {
         const grid = document.getElementById('photoGrid');
         if (!grid) return;
-        grid.innerHTML = students.map(name => {
-          const saved = localStorage.getItem(`photo_${name}`);
-          const imgHtml = saved
-            ? `<img src="${saved}" class="photo-img" alt="${name}">`
-            : `<div class="photo-placeholder">📷<br>добавить</div>`;
-          return `<div class="photo-card" data-student="${name}">${imgHtml}<div class="photo-name">${name}</div></div>`;
-        }).join('');
-        document.querySelectorAll('.photo-card').forEach(card => {
-          card.addEventListener('click', () => {
-            currentPhotoStudent = card.getAttribute('data-student');
-            document.getElementById('hiddenFileInput').click();
+        allStudentPhotosRef.on('value', (snap) => {
+          const photos = snap.val() || {};
+          grid.innerHTML = students.map(name => {
+            const saved = photos[name] || null;
+            const imgHtml = saved
+              ? `<img src="${saved}" class="photo-img" alt="${name}">`
+              : `<div class="photo-placeholder">📷<br>добавить</div>`;
+            return `<div class="photo-card" data-student="${name}">${imgHtml}<div class="photo-name">${name}</div></div>`;
+          }).join('');
+          document.querySelectorAll('.photo-card').forEach(card => {
+            card.addEventListener('click', () => {
+              currentPhotoStudent = card.getAttribute('data-student');
+              document.getElementById('hiddenFileInput').click();
+            });
           });
         });
       }
+
       document.getElementById('hiddenFileInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file || !currentPhotoStudent) return;
         const reader = new FileReader();
         reader.onload = ev => {
-          localStorage.setItem(`photo_${currentPhotoStudent}`, ev.target.result);
-          renderPhotoGrid();
+          studentPhotosRef(currentPhotoStudent).set(ev.target.result);
         };
         reader.readAsDataURL(file);
         this.value = '';
@@ -1193,55 +1196,51 @@
 
       function saveTestResults() {
         if (!testAnswers.name) return;
-        localStorage.setItem(`test_${testAnswers.name}`, JSON.stringify(testAnswers));
+        testResultsRef(testAnswers.name).set({
+          trips: testAnswers.trips,
+          favorite: testAnswers.favorite
+        });
       }
 
       function renderResultsTable() {
         const container = document.getElementById('resultsContent');
         if (!container) return;
-        const results = [];
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && key.startsWith('test_')) {
-            try {
-              const data = JSON.parse(localStorage.getItem(key));
-              if (data && data.name) results.push(data);
-            } catch(e) {}
+        allTestResultsRef.on('value', (snap) => {
+          const results = snap.val() || {};
+          const resultArray = Object.keys(results).map(name => ({ name, ...results[name] }));
+          if (resultArray.length === 0) {
+            container.innerHTML = '<div class="empty-state">📭 Пока никто не прошёл тест.<br>Пройди на вкладке «Тест»</div>';
+            return;
           }
-        }
-        if (results.length === 0) {
-          container.innerHTML = '<div class="empty-state">📭 Пока никто не прошёл тест.<br>Пройди на вкладке «Тест»</div>';
-          return;
-        }
-        results.sort((a,b) => a.name.localeCompare(b.name));
-
-        let html = `<table class="results-table"><thead><tr>
-          <th>Ученик</th>
-          <th>🏛️</th><th>🦁</th><th>🌑</th><th>🤸</th><th>🌆</th>
-          <th>❤️</th>
-        </tr></thead><tbody>`;
-
-        results.forEach(r => {
-          const museum = r.trips?.[tripQuestions[0]] === 'yes';
-          const zoo = r.trips?.[tripQuestions[1]] === 'yes';
-          const hide = r.trips?.[tripQuestions[2]] === 'yes';
-          const trampoline = r.trips?.[tripQuestions[3]] === 'yes';
-          const krasnodar = r.trips?.[tripQuestions[4]] === 'yes';
-          const fav = r.favorite || '—';
-          html += `<tr>
-            <td><strong>${r.name}</strong></td>
-            <td><span class="trip-indicator ${museum ? 'yes' : 'no'}"></span></td>
-            <td><span class="trip-indicator ${zoo ? 'yes' : 'no'}"></span></td>
-            <td><span class="trip-indicator ${hide ? 'yes' : 'no'}"></span></td>
-            <td><span class="trip-indicator ${trampoline ? 'yes' : 'no'}"></span></td>
-            <td><span class="trip-indicator ${krasnodar ? 'yes' : 'no'}"></span></td>
-            <td><span class="favorite-badge">${fav}</span></td>
-          </tr>`;
+          resultArray.sort((a,b) => a.name.localeCompare(b.name));
+          let html = `<table class="results-table"><thead><tr>
+            <th>Ученик</th>
+            <th>🏛️</th><th>🦁</th><th>🌑</th><th>🤸</th><th>🌆</th>
+            <th>❤️</th>
+          </tr></thead><tbody>`;
+          resultArray.forEach(r => {
+            const museum = r.trips?.[tripQuestions[0]] === 'yes';
+            const zoo = r.trips?.[tripQuestions[1]] === 'yes';
+            const hide = r.trips?.[tripQuestions[2]] === 'yes';
+            const trampoline = r.trips?.[tripQuestions[3]] === 'yes';
+            const krasnodar = r.trips?.[tripQuestions[4]] === 'yes';
+            const fav = r.favorite || '—';
+            html += `<tr>
+              <td><strong>${r.name}</strong></td>
+              <td><span class="trip-indicator ${museum ? 'yes' : 'no'}"></span></td>
+              <td><span class="trip-indicator ${zoo ? 'yes' : 'no'}"></span></td>
+              <td><span class="trip-indicator ${hide ? 'yes' : 'no'}"></span></td>
+              <td><span class="trip-indicator ${trampoline ? 'yes' : 'no'}"></span></td>
+              <td><span class="trip-indicator ${krasnodar ? 'yes' : 'no'}"></span></td>
+              <td><span class="favorite-badge">${fav}</span></td>
+            </tr>`;
+          });
+          html += '</tbody></table>';
+          container.innerHTML = html;
         });
-        html += '</tbody></table>';
-        container.innerHTML = html;
       }
 
+      // Фото учителя (оставим локально)
       const teacherKey = 'photo_teacher';
       const teacherAvatar = document.getElementById('teacherPhoto');
       const savedTeacher = localStorage.getItem(teacherKey);
@@ -1270,27 +1269,10 @@
       function renderTripInfo() {
         const container = document.getElementById('tripInfoContainer');
         if (!container) return;
-        const tripPhotos = getTripPhotos();
-
         container.innerHTML = tripQuestions.map(trip => {
           const icon = tripIcons[trip] || '📍';
           const desc = tripDescriptions[trip] || 'Описание скоро появится.';
-          const photos = tripPhotos[trip] || [];
-
-          let photosHtml = '';
-          if (photos.length > 0) {
-            photosHtml = '<div class="trip-photos">';
-            photos.forEach((photoUrl, index) => {
-              photosHtml += `
-                <div class="photo-thumb-wrapper">
-                  <img src="${photoUrl}" class="trip-photo-thumb" alt="Фото ${index+1}">
-                  <button class="photo-thumb-delete" data-trip="${trip}" data-index="${index}">✕</button>
-                </div>
-              `;
-            });
-            photosHtml += '</div>';
-          }
-
+          const tripId = trip.replace(/\s/g,'');
           return `
             <div class="trip-info-card">
               <div class="trip-header">
@@ -1300,36 +1282,44 @@
                   <div class="trip-info-desc">${desc}</div>
                 </div>
               </div>
-              ${photosHtml}
+              <div class="trip-photos" id="tripPhotos_${tripId}"></div>
               <button class="add-photo-btn" data-trip="${trip}">📷 Добавить фото</button>
             </div>
           `;
         }).join('');
 
+        tripQuestions.forEach(trip => {
+          const tripId = trip.replace(/\s/g,'');
+          tripPhotosRef(tripId).on('value', (snap) => {
+            const photos = snap.val() || [];
+            const photosContainer = document.getElementById('tripPhotos_' + tripId);
+            if (photosContainer) {
+              photosContainer.innerHTML = photos.map((url, index) => `
+                <div class="photo-thumb-wrapper">
+                  <img src="${url}" class="trip-photo-thumb" alt="Фото">
+                  <button class="photo-thumb-delete" data-trip="${trip}" data-index="${index}">✕</button>
+                </div>
+              `).join('');
+            }
+          });
+        });
+
         container.addEventListener('click', (e) => {
           if (e.target.classList.contains('add-photo-btn')) {
-            const trip = e.target.getAttribute('data-trip');
-            currentTripForPhoto = trip;
+            currentTripForPhoto = e.target.getAttribute('data-trip');
             tripPhotoInput.click();
           }
           if (e.target.classList.contains('photo-thumb-delete')) {
             const trip = e.target.getAttribute('data-trip');
             const index = parseInt(e.target.getAttribute('data-index'));
-            deleteTripPhoto(trip, index);
+            const tripId = trip.replace(/\s/g,'');
+            tripPhotosRef(tripId).once('value').then(snap => {
+              const photos = snap.val() || [];
+              photos.splice(index, 1);
+              tripPhotosRef(tripId).set(photos);
+            });
           }
         });
-      }
-
-      function deleteTripPhoto(trip, index) {
-        const photos = getTripPhotos();
-        if (photos[trip] && photos[trip].length > index) {
-          photos[trip].splice(index, 1);
-          if (photos[trip].length === 0) {
-            delete photos[trip];
-          }
-          saveTripPhotos(photos);
-          renderTripInfo();
-        }
       }
 
       tripPhotoInput.addEventListener('change', function(e) {
@@ -1338,53 +1328,51 @@
         const reader = new FileReader();
         reader.onload = ev => {
           const dataUrl = ev.target.result;
-          const photos = getTripPhotos();
-          if (!photos[currentTripForPhoto]) {
-            photos[currentTripForPhoto] = [];
-          }
-          photos[currentTripForPhoto].push(dataUrl);
-          saveTripPhotos(photos);
-          renderTripInfo();
+          const tripId = currentTripForPhoto.replace(/\s/g,'');
+          tripPhotosRef(tripId).push(dataUrl);
         };
         reader.readAsDataURL(file);
         this.value = '';
         currentTripForPhoto = null;
       });
 
-      function renderPlannedTrips() {
+      function loadPlannedTrips() {
         const list = document.getElementById('plannedList');
         if (!list) return;
-        const planned = getPlannedTrips();
-        if (planned.length === 0) {
-          list.innerHTML = '<div class="empty-state" style="padding:20px;">Нет запланированных поездок</div>';
-          return;
-        }
-        list.innerHTML = planned.map(p => {
-          const dateStr = p.date ? new Date(p.date).toLocaleDateString('ru-RU') : '';
-          const timeStr = p.time || '';
-          return `
-            <li class="planned-item" data-id="${p.id}">
-              <div class="planned-info">
-                <div class="planned-title">${p.title}</div>
-                <div class="planned-meta">${dateStr} ${timeStr} ${p.note ? '· ' + p.note : ''}</div>
-              </div>
-              <button class="planned-delete">✕</button>
-            </li>
-          `;
-        }).join('');
-
-        document.querySelectorAll('.planned-delete').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            const id = e.target.closest('.planned-item').getAttribute('data-id');
-            deletePlannedTrip(id);
+        plannedTripsRef.on('value', (snap) => {
+          const trips = snap.val() || [];
+          if (trips.length === 0) {
+            list.innerHTML = '<div class="empty-state" style="padding:20px;">Нет запланированных поездок</div>';
+            return;
+          }
+          list.innerHTML = trips.map(p => {
+            const dateStr = p.date ? new Date(p.date).toLocaleDateString('ru-RU') : '';
+            const timeStr = p.time || '';
+            return `
+              <li class="planned-item" data-id="${p.id}">
+                <div class="planned-info">
+                  <div class="planned-title">${p.title}</div>
+                  <div class="planned-meta">${dateStr} ${timeStr} ${p.note ? '· ' + p.note : ''}</div>
+                </div>
+                <button class="planned-delete">✕</button>
+              </li>
+            `;
+          }).join('');
+          document.querySelectorAll('.planned-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              const id = e.target.closest('.planned-item').getAttribute('data-id');
+              deletePlannedTrip(id);
+            });
           });
         });
       }
 
       function deletePlannedTrip(id) {
-        const trips = getPlannedTrips().filter(t => t.id !== id);
-        savePlannedTrips(trips);
-        renderPlannedTrips();
+        plannedTripsRef.once('value').then(snap => {
+          const trips = snap.val() || [];
+          const updated = trips.filter(t => t.id !== id);
+          plannedTripsRef.set(updated);
+        });
       }
 
       document.getElementById('addPlannedBtn').addEventListener('click', () => {
@@ -1392,76 +1380,53 @@
         const date = document.getElementById('plannedDate').value;
         const time = document.getElementById('plannedTime').value;
         const note = document.getElementById('plannedNote').value.trim();
-
-        if (!title || !date) {
-          alert('Введите название и дату');
-          return;
-        }
-
-        const newPlanned = {
-          id: Date.now().toString(),
-          title,
-          date,
-          time,
-          note
-        };
-        const trips = getPlannedTrips();
-        trips.push(newPlanned);
-        savePlannedTrips(trips);
-        renderPlannedTrips();
-
+        if (!title || !date) { alert('Введите название и дату'); return; }
+        const newPlanned = { id: Date.now().toString(), title, date, time, note };
+        plannedTripsRef.push(newPlanned);
         document.getElementById('plannedTitle').value = '';
         document.getElementById('plannedDate').value = '';
         document.getElementById('plannedTime').value = '';
         document.getElementById('plannedNote').value = '';
-
-        showToast('✅ Поездка добавлена! Оповещение отправлено всем.');
+        showToast('✅ Поездка добавлена!');
       });
 
-      const remindersKey = 'class_reminders';
-      function getReminders() {
-        const stored = localStorage.getItem(remindersKey);
-        return stored ? JSON.parse(stored) : [];
-      }
-
-      function saveReminders(reminders) {
-        localStorage.setItem(remindersKey, JSON.stringify(reminders));
-      }
-
-      function renderReminders() {
+      function loadReminders() {
         const list = document.getElementById('reminderList');
         if (!list) return;
-        const reminders = getReminders();
-        if (reminders.length === 0) {
-          list.innerHTML = '<div class="empty-state" style="padding:20px;">Нет напоминаний</div>';
-          return;
-        }
-        list.innerHTML = reminders.map(r => {
-          const dateStr = r.date ? new Date(r.date).toLocaleDateString('ru-RU') : '';
-          const timeStr = r.time || '';
-          return `
-            <li class="reminder-item" data-id="${r.id}">
-              <div class="reminder-info">
-                <div class="reminder-title">${r.title}</div>
-                <div class="reminder-meta">${dateStr} ${timeStr} ${r.note ? '· ' + r.note : ''}</div>
-              </div>
-              <button class="reminder-delete">✕</button>
-            </li>
-          `;
-        }).join('');
-
-        document.querySelectorAll('.reminder-delete').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            const id = e.target.closest('.reminder-item').getAttribute('data-id');
-            deleteReminder(id);
+        remindersRef.on('value', (snap) => {
+          const reminders = snap.val() || [];
+          if (reminders.length === 0) {
+            list.innerHTML = '<div class="empty-state" style="padding:20px;">Нет напоминаний</div>';
+            return;
+          }
+          list.innerHTML = reminders.map(r => {
+            const dateStr = r.date ? new Date(r.date).toLocaleDateString('ru-RU') : '';
+            const timeStr = r.time || '';
+            return `
+              <li class="reminder-item" data-id="${r.id}">
+                <div class="reminder-info">
+                  <div class="reminder-title">${r.title}</div>
+                  <div class="reminder-meta">${dateStr} ${timeStr} ${r.note ? '· ' + r.note : ''}</div>
+                </div>
+                <button class="reminder-delete">✕</button>
+              </li>
+            `;
+          }).join('');
+          document.querySelectorAll('.reminder-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              const id = e.target.closest('.reminder-item').getAttribute('data-id');
+              deleteReminder(id);
+            });
           });
         });
       }
 
       function deleteReminder(id) {
-        const reminders = getReminders().filter(r => r.id !== id);
-        saveReminders(reminders);
-        renderReminders();
+        remindersRef.once('value').then(snap => {
+          const reminders = snap.val() || [];
+          const updated = reminders.filter(r => r.id !== id);
+          remindersRef.set(updated);
+        });
       }
 
       document.getElementById('addReminderBtn').addEventListener('click', () => {
@@ -1469,24 +1434,9 @@
         const date = document.getElementById('reminderDate').value;
         const time = document.getElementById('reminderTime').value;
         const note = document.getElementById('reminderNote').value.trim();
-
-        if (!title || !date) {
-          alert('Введите название и дату');
-          return;
-        }
-
-        const newReminder = {
-          id: Date.now().toString(),
-          title,
-          date,
-          time,
-          note
-        };
-        const reminders = getReminders();
-        reminders.push(newReminder);
-        saveReminders(reminders);
-        renderReminders();
-
+        if (!title || !date) { alert('Введите название и дату'); return; }
+        const newReminder = { id: Date.now().toString(), title, date, time, note };
+        remindersRef.push(newReminder);
         document.getElementById('reminderTitle').value = '';
         document.getElementById('reminderDate').value = '';
         document.getElementById('reminderTime').value = '';
@@ -1498,7 +1448,6 @@
       initTest();
       switchPage('home');
     })();
-    </script>
-    <div class="watermark">by Mikhail Lugovoy</div>
+  </script>
 </body>
 </html>
